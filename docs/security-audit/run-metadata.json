@@ -1,0 +1,39 @@
+{
+  "run_id": "move30-run-1",
+  "repo": "move30",
+  "target": "/home/claude/move30-ent",
+  "source_ref": {
+    "commit": "944cfbc83e7285866d2a72c3c3c4efa491e93cb2",
+    "dirty": false
+  },
+  "profile": "quick",
+  "scope_paths": [
+    "server/",
+    "db/",
+    "web/src/ (excluding web/src/components/arc and web/src/lib, third-party UI library code)",
+    "web/public/",
+    "web/index.html"
+  ],
+  "budget": 15,
+  "execution_policy": "sandboxed-source-and-local-only",
+  "execution_capability": "No OS-enforced sandbox satisfying every required control (empty env, no external network, read-only target and toolchain, scratch-only writes, resource limits) is available on this host (no bwrap/firejail; unshare alone cannot make the toolchain read-only). Target-controlled execution is therefore blocked for all agents; review is source-only.",
+  "companions": [
+    "WEB-PROTOCOL-AND-AUTH.md",
+    "DATA-ISOLATION-AND-LIFECYCLE.md",
+    "CLIENT-SIDE.md"
+  ],
+  "prior_runs": [],
+  "shared_file_owners": {
+    "all_shared_files": "parent"
+  },
+  "run_status": "complete",
+  "budget_note": "Parent-proposed budget raised from 14 to 15 after wave 1 (6 unique candidates need 6 verifiers in quick profile); not user-set.",
+  "agents_spent": {
+    "reconnaissance": 4,
+    "hunters": 4,
+    "coverage_critic": 1,
+    "verifiers": 6,
+    "total": 15
+  },
+  "note": "Quick profile: one hunter wave, one final critic; critic-proposed units recorded as deferred. Every candidate received one independent verifier (Phase 3/5 merged)."
+}

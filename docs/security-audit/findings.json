@@ -1,0 +1,493 @@
+[
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "auth.js/sso-callback/email-autolink-without-proof",
+    "title": "SSO callback links an existing same-org account by IdP email claim alone; an org admin who controls the IdP (or an IdP that lets users choose their email) can get a session as that member",
+    "description": "When no user matches (org, sub), step 2 of GET /api/auth/sso/callback looks up a user by the token's email (falling back to preferred_username; only email_verified === false is rejected). If that user is in the same org and has no sso_sub, the IdP sub is written onto the account and a session is created, with no credential or session from that account. Org admins choose the IdP (PUT /api/org/sso), so an admin pointing SSO at an IdP they control can log in as any not-yet-linked member and read that member's individual break history (/api/me/summary, /api/me/export), which the product promises admins never see. Step 1 matches (org_id, sub) without binding the issuer, so after an issuer change an admin can also replay a linked member's sub. A second path exists without an admin when the IdP lets users set an unverified email or preferred_username.",
+    "claimed_root_cause": "Step 2 of /api/auth/sso/callback (auth.js:179-193) treats the email claim (preferred_username fallback, missing email_verified accepted) as proof of ownership of an existing same-org account with null sso_sub; no existing credential or session is required, and sso_sub is not bound to the issuer, while the org admin chooses the IdP and individual activity is promised visible only to the member.",
+    "trace": [
+      {
+        "kind": "entrypoint",
+        "file": "server/src/routes/org.js",
+        "line": 55,
+        "scope": "PUT /api/org/sso (requireAdmin)",
+        "description": "Org admin sets any public HTTPS issuer, client ID and secret."
+      },
+      {
+        "kind": "propagation",
+        "file": "server/src/routes/auth.js",
+        "line": 170,
+        "scope": "GET /api/auth/sso/callback",
+        "description": "client.callback validates the token against the admin-configured IdP only."
+      },
+      {
+        "kind": "propagation",
+        "file": "server/src/routes/auth.js",
+        "line": 179,
+        "scope": "GET /api/auth/sso/callback",
+        "description": "rawEmail from claims.email or claims.preferred_username."
+      },
+      {
+        "kind": "propagation",
+        "file": "server/src/routes/auth.js",
+        "line": 180,
+        "scope": "GET /api/auth/sso/callback",
+        "description": "Only email_verified === false is rejected."
+      },
+      {
+        "kind": "propagation",
+        "file": "server/src/routes/auth.js",
+        "line": 189,
+        "scope": "SSO provisioning step 2",
+        "description": "Existing user selected by lower(email); refused only for another org or existing sso_sub (line 191)."
+      },
+      {
+        "kind": "sink",
+        "file": "server/src/routes/auth.js",
+        "line": 192,
+        "scope": "SSO provisioning step 2",
+        "description": "Writes the supplied sub onto the victim account; createSession at line 223 issues a session for it."
+      }
+    ],
+    "evidence": [
+      {
+        "file": "server/src/routes/org.js",
+        "line": 70,
+        "description": "Issuer only checked by assertPublicHttpsUrl."
+      },
+      {
+        "file": "server/src/routes/org.js",
+        "line": 124,
+        "description": "Comment: members listing has no activity data by design."
+      },
+      {
+        "file": "server/src/analytics.js",
+        "line": 10,
+        "description": "Admins are meant to see only suppressed aggregates."
+      },
+      {
+        "file": "server/src/routes/auth.js",
+        "line": 185,
+        "description": "Step 1 matches (org_id, sub) without an issuer binding."
+      },
+      {
+        "file": "db/migrations/001_init.sql",
+        "line": 38,
+        "description": "users.sso_sub has no issuer column."
+      },
+      {
+        "file": "server/src/routes/me.js",
+        "line": 99,
+        "description": "GET /api/me/export returns the session user's individual history."
+      }
+    ],
+    "blockers": [
+      "no OS-enforced sandbox available for bounded local execution",
+      "For the non-admin path: whether the deployed IdP lets users set an unverified email or preferred_username and omits email_verified (IdP policy outside the repository)."
+    ],
+    "validation_plan": {
+      "local": "In an approved sandbox with a disposable PostgreSQL and a mock OIDC issuer (netguard stubbed in a scratch copy): seed org O with admin A and password-only member M (sso_sub NULL) plus one break for M. As A enable SSO to the mock issuer; mock issues sub='attacker-1', email=M's address, no email_verified. Complete /api/auth/sso/<slug> then /callback with no M credentials. Vulnerable if users.sso_sub for M becomes 'attacker-1' and GET /api/me/export with the returned cookie shows M's break. Stop there.",
+      "deployment": "Owner confirms whether org admins are untrusted with respect to members' individual break data, and whether configured IdPs always send email_verified=true and prevent user-edited email/UPN."
+    }
+  },
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "auth.js/sso-callback/multitenant-issuer-accepted",
+    "title": "Multi-tenant Entra issuer (common/organizations/consumers) accepted, so ID tokens from any Microsoft tenant can reach email-based linking and provisioning in the org",
+    "description": "PUT /api/org/sso accepts the shared Microsoft endpoints despite a UI hint asking for a tenant-specific issuer. openid-client 5.7.1 enables aadIssValidation for those discovery URLs and substitutes the token's own tid into the expected issuer, so a validly signed token from any tenant passes. The callback then links by email (step 2) or provisions through allowed_domains (step 3) and creates a session. Exploitation also needs a multi-tenant app registration and a foreign-tenant user able to carry a chosen email claim; those facts are outside the repository.",
+    "claimed_root_cause": "The server never limits the configured issuer to a single tenant (no rejection of the shared Entra discovery URLs or of a '{tenantid}' templated metadata.issuer, no tid check), while openid-client accepts any tenant's iss for those URLs and the callback trusts the unverified-by-default email claim.",
+    "trace": [
+      {
+        "kind": "entrypoint",
+        "file": "server/src/routes/org.js",
+        "line": 55,
+        "scope": "org.put('/sso')",
+        "description": "Issuer stored after zod url() and assertPublicHttpsUrl only."
+      },
+      {
+        "kind": "propagation",
+        "file": "server/src/routes/auth.js",
+        "line": 127,
+        "scope": "getClient",
+        "description": "Issuer.discover builds the client; discovered issuer not compared with the configured URL."
+      },
+      {
+        "kind": "propagation",
+        "file": "server/node_modules/openid-client/lib/issuer.js",
+        "line": 156,
+        "scope": "Issuer.discover",
+        "description": "Sets the AAD multitenant flag for common/organizations/consumers."
+      },
+      {
+        "kind": "propagation",
+        "file": "server/node_modules/openid-client/lib/client.js",
+        "line": 953,
+        "scope": "Client#validateJWT",
+        "description": "Expected iss = issuer with the token's own tid substituted."
+      },
+      {
+        "kind": "sink",
+        "file": "server/src/routes/auth.js",
+        "line": 189,
+        "scope": "GET /sso/callback provisioning",
+        "description": "Accepted foreign-tenant email links or provisions an account; session at line 223."
+      }
+    ],
+    "evidence": [
+      {
+        "file": "web/src/pages/admin/Security.tsx",
+        "line": 73,
+        "description": "Tenant-specific issuer is only a UI hint."
+      },
+      {
+        "file": "server/node_modules/openid-client/lib/issuer.js",
+        "line": 13,
+        "description": "AAD_MULTITENANT_DISCOVERY list."
+      },
+      {
+        "file": "server/src/routes/auth.js",
+        "line": 180,
+        "description": "Missing email_verified accepted."
+      },
+      {
+        "file": "server/src/routes/auth.js",
+        "line": 191,
+        "description": "Linking not bound to issuer or tenant."
+      }
+    ],
+    "blockers": [
+      "no OS-enforced sandbox available for bounded local execution",
+      "Whether any deployed org stores a multi-tenant Entra issuer (deployment data).",
+      "Whether the Entra app registration is multi-tenant (outside the repository).",
+      "Whether a foreign-tenant user can obtain a token for that client with a chosen email or preferred_username (Entra policy)."
+    ],
+    "validation_plan": {
+      "local": "In an approved sandbox with no network, serve a fixture discovery document mapped to the common v2.0 URL with issuer 'https://login.microsoftonline.com/{tenantid}/v2.0' and a local JWKS; with dummy org O (sso_issuer = common URL) and member victim@example.test (no sso_sub), complete the callback with an ID token tid=attacker-tenant, matching iss, correct aud/nonce, email=victim@example.test, no email_verified. Vulnerable if victim's sso_sub is set and a session cookie returned; control with a tenant-specific issuer fails with sso_failed.",
+      "deployment": "Owner runs a read-only query for organizations.sso_issuer matching login.microsoftonline.com/(common|organizations|consumers) and checks the matching app registrations' supported account types."
+    }
+  },
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "move30/invite-accept-unverified-email-prehijack",
+    "title": "Email-less invite lets the holder register any unverified email, which SSO later links to the real owner (pre-hijack / SSO-enforcement bypass)",
+    "description": "For an invite created without an email, POST /api/auth/invite/:token/accept takes the account email from the request body without ownership proof, creates a password account in the org and opens a session, without checking sso_enforced. When the real owner later signs in by SSO, step 2 links their IdP sub to that row without clearing password_hash or revoking sessions, so the invite holder keeps access through the 14-day session and, when SSO is not enforced or the invite role was admin, through password login. The pre-registered row also blocks the real owner from accepting their own invite.",
+    "claimed_root_cause": "Invite accept uses body.email for email-less invites without ownership proof (auth.js:96-97) and ignores org.sso_enforced; SSO step 2 (auth.js:189-193) later links the victim's sub to that account without clearing password_hash or revoking existing sessions.",
+    "trace": [
+      {
+        "kind": "entrypoint",
+        "file": "server/src/routes/auth.js",
+        "line": 94,
+        "scope": "auth.post('/invite/:token/accept')",
+        "description": "Unauthenticated accept gated only by the invite token."
+      },
+      {
+        "kind": "propagation",
+        "file": "server/src/routes/auth.js",
+        "line": 97,
+        "scope": "auth.post('/invite/:token/accept')",
+        "description": "finalEmail = inv.email || body.email."
+      },
+      {
+        "kind": "propagation",
+        "file": "server/src/routes/auth.js",
+        "line": 106,
+        "scope": "accept transaction",
+        "description": "Inserts the user with the attacker's password and the invite role; no sso_enforced check; session at line 110."
+      },
+      {
+        "kind": "propagation",
+        "file": "server/src/routes/auth.js",
+        "line": 189,
+        "scope": "auth.get('/sso/callback') step 2",
+        "description": "Victim's SSO login finds the row by email."
+      },
+      {
+        "kind": "sink",
+        "file": "server/src/routes/auth.js",
+        "line": 192,
+        "scope": "auth.get('/sso/callback') step 2",
+        "description": "sso_sub set on the attacker-created row; password_hash and sessions kept."
+      }
+    ],
+    "evidence": [
+      {
+        "file": "server/src/routes/org.js",
+        "line": 176,
+        "description": "Invite email optional."
+      },
+      {
+        "file": "server/src/routes/auth.js",
+        "line": 65,
+        "description": "Password login under enforcement still allowed for admins."
+      },
+      {
+        "file": "server/src/security.js",
+        "line": 69,
+        "description": "Session from accept lasts SESSION_DAYS and is not revoked by the link."
+      },
+      {
+        "file": "db/migrations/001_init.sql",
+        "line": 42,
+        "description": "Global email uniqueness lets the first registrant win the address."
+      }
+    ],
+    "blockers": [
+      "no OS-enforced sandbox available for bounded local execution",
+      "Whether orgs hand email-less invite links to people other than the owners of the emails used, and whether the IdP sends email_verified (deployment and process facts)."
+    ],
+    "validation_plan": {
+      "local": "In an approved sandbox with a disposable PostgreSQL and mock OIDC issuer: admin creates an email-less invite; attacker accepts with victim@o.test and a known password, keeping the cookie; victim completes SSO with matching email. Vulnerable if the attacker row gets the victim's sso_sub with password_hash still set and the attacker's original cookie reads the victim's break via GET /api/me/export.",
+      "deployment": "Owner runs read-only counts of invites with NULL email and of users with both sso_sub and password_hash set."
+    }
+  },
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "move30/invite-outlives-creator-admin-revocation",
+    "title": "Pending admin-role invites survive demotion or removal of the admin who created them",
+    "description": "An admin can mint email-less invites with role 'admin'. Demotion (PATCH /api/org/members/:id) deletes only the person's sessions and removal deletes the user row, but their invites stay valid until expiry (INVITE_DAYS, default 7); created_by becomes NULL and the invite list does not show the creator, so remaining admins cannot tell which invites to revoke. The revoked person can accept a kept link with any unused email and regain an admin account, defeating the revocation that the code comment says applies immediately.",
+    "claimed_root_cause": "Admin revocation (org.js:148-151, org.js:159) never revokes invites the revoked admin created; invites.created_by is ON DELETE SET NULL (001_init.sql:59) and not exposed in the list (org.js:167); accept (auth.js:94-109) and SSO redemption (auth.js:200-208) grant inv.role without checking the creator's current authority.",
+    "trace": [
+      {
+        "kind": "entrypoint",
+        "file": "server/src/routes/org.js",
+        "line": 174,
+        "scope": "POST /api/org/invites",
+        "description": "Admin creates an email-less role 'admin' invite."
+      },
+      {
+        "kind": "propagation",
+        "file": "server/src/routes/org.js",
+        "line": 151,
+        "scope": "PATCH /api/org/members/:id",
+        "description": "Demotion deletes only sessions."
+      },
+      {
+        "kind": "propagation",
+        "file": "server/src/routes/org.js",
+        "line": 159,
+        "scope": "DELETE /api/org/members/:id",
+        "description": "Removal leaves the creator's invites untouched."
+      },
+      {
+        "kind": "propagation",
+        "file": "db/migrations/001_init.sql",
+        "line": 59,
+        "scope": "invites table",
+        "description": "created_by ON DELETE SET NULL keeps the invite alive."
+      },
+      {
+        "kind": "propagation",
+        "file": "server/src/routes/auth.js",
+        "line": 82,
+        "scope": "findInvite",
+        "description": "Validity checks only hash, used_at and expiry."
+      },
+      {
+        "kind": "sink",
+        "file": "server/src/routes/auth.js",
+        "line": 108,
+        "scope": "POST /api/auth/invite/:token/accept",
+        "description": "Inserts a user with role inv.role ('admin') and a session."
+      }
+    ],
+    "evidence": [
+      {
+        "file": "server/src/routes/org.js",
+        "line": 150,
+        "description": "Comment states new permissions should apply immediately."
+      },
+      {
+        "file": "server/src/routes/org.js",
+        "line": 185,
+        "description": "Up to 500 pending invites per org."
+      },
+      {
+        "file": "server/src/routes/org.js",
+        "line": 198,
+        "description": "Mitigation: remaining admins can delete pending invites."
+      },
+      {
+        "file": "server/src/routes/auth.js",
+        "line": 208,
+        "description": "SSO path also assigns inv.role."
+      }
+    ],
+    "blockers": [
+      "no OS-enforced sandbox available for bounded local execution",
+      "Product intent: whether pending invites are org-owned (survive their creator) or carry the creator's authority."
+    ],
+    "validation_plan": {
+      "local": "In an approved sandbox: admins A and B in dummy org O; A creates {role:'admin'} invite; B demotes (then, separately, deletes) A; accept A's token unauthenticated with a fresh email. Vulnerable if a 201 response creates an admin user in O and GET /api/org/members succeeds with the new cookie.",
+      "deployment": "Owner states production INVITE_DAYS and whether invites from a demoted or removed admin should stay redeemable."
+    }
+  },
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "netguard.js/sso-discovered-endpoints-unguarded",
+    "title": "SSRF guard covers only the SSO issuer URL; discovered token_endpoint and jwks_uri (http:// or private IPs) are fetched unchecked, and DNS is not pinned",
+    "description": "Self-serve signup (default on) lets an anonymous user become an org admin and set an SSO issuer. assertPublicHttpsUrl checks only that issuer string, using a DNS lookup the later connection does not reuse. openid-client then trusts the discovery document: on the callback it POSTs a form body with Basic credentials to the metadata token_endpoint and may GET the metadata jwks_uri, accepting http: and any address. The attacker runs the IdP and can trigger the callback at will. Errors collapse to /login?error=sso_failed, so this is a blind SSRF with fixed request shapes whose impact depends on what the deployed host can reach.",
+    "claimed_root_cause": "assertPublicHttpsUrl (netguard.js:23-34) checks only the admin-typed issuer through a separate, unpinned DNS lookup; metadata-supplied token_endpoint and jwks_uri go to openid-client's request helper, which allows http: and any address, and the app sets no http_options/lookup hook applying the same policy.",
+    "trace": [
+      {
+        "kind": "entrypoint",
+        "file": "server/src/routes/org.js",
+        "line": 55,
+        "scope": "org.put('/sso')",
+        "description": "Admin (reachable via open signup) stores the issuer."
+      },
+      {
+        "kind": "propagation",
+        "file": "server/src/netguard.js",
+        "line": 30,
+        "scope": "assertPublicHttpsUrl",
+        "description": "Resolves only the issuer host; address not pinned."
+      },
+      {
+        "kind": "propagation",
+        "file": "server/src/routes/auth.js",
+        "line": 127,
+        "scope": "getClient",
+        "description": "Issuer.discover re-resolves and keeps all metadata endpoints."
+      },
+      {
+        "kind": "propagation",
+        "file": "server/src/routes/auth.js",
+        "line": 170,
+        "scope": "GET /sso/callback",
+        "description": "client.callback runs the token grant."
+      },
+      {
+        "kind": "propagation",
+        "file": "server/node_modules/openid-client/lib/helpers/client.js",
+        "line": 174,
+        "scope": "authenticatedPost",
+        "description": "targetUrl = issuer.token_endpoint from metadata."
+      },
+      {
+        "kind": "sink",
+        "file": "server/node_modules/openid-client/lib/helpers/request.js",
+        "line": 123,
+        "scope": "request",
+        "description": "http(s).request to the unvalidated URL; http: allowed at line 69."
+      }
+    ],
+    "evidence": [
+      {
+        "file": "server/src/routes/auth.js",
+        "line": 124,
+        "description": "Only org.sso_issuer re-checked before discovery."
+      },
+      {
+        "file": "server/src/config.js",
+        "line": 25,
+        "description": "allowSignup defaults to true."
+      },
+      {
+        "file": "server/node_modules/openid-client/lib/helpers/issuer.js",
+        "line": 39,
+        "description": "jwks_uri fetched without validation."
+      },
+      {
+        "file": "server/src/routes/auth.js",
+        "line": 175,
+        "description": "Errors collapse to sso_failed, so the SSRF is blind."
+      }
+    ],
+    "blockers": [
+      "no OS-enforced sandbox available for bounded local execution",
+      "Which internal or link-local services the deployed host can reach and whether egress filtering blocks them."
+    ],
+    "validation_plan": {
+      "local": "In an approved sandbox with no external network: a fake HTTPS IdP (resolver maps it to a non-private test IP) whose metadata sets token_endpoint=http://127.0.0.1:9999/probe; a loopback listener on 9999 logs requests. Sign up, PUT /api/org/sso, GET /api/auth/sso/<slug>, then GET /callback?code=x&state=<state>. Vulnerable if the listener logs a POST with grant_type=authorization_code.",
+      "deployment": "Owner reports whether ALLOW_SIGNUP is on in production and whether host egress allows RFC1918, loopback or 169.254.0.0/16 destinations."
+    }
+  },
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "server/src/analytics.js:orgAnalytics:min-group-suppression-bypass-via-admin-controlled-group-composition",
+    "title": "Org admin can single out one member's activity despite MIN_GROUP_SIZE by composing a team of the target plus admin-controlled accounts",
+    "description": "MIN_GROUP_SIZE is enforced as a headcount over teams whose composition the admin controls: any member can be moved into any team, and email-less invites accepted with arbitrary emails create extra members at will. Person-days are labelled with the current team_id, so a moved member's past breaks follow them. Team participation is returned without an active>=min gate (revealing whether the target was active), and avgBreaksPerDay mixes the target's unknown counts with known contributions from controlled accounts across 7/30/90-day windows.",
+    "claimed_root_cause": "Suppression is a headcount check over admin-controlled groups (team reassignment, self-accepted email-less invites, controlled accounts with known break logs), applied retroactively through the current users.team_id, and team participation is released without the active>=min gate.",
+    "trace": [
+      {
+        "kind": "entrypoint",
+        "file": "server/src/routes/org.js",
+        "line": 203,
+        "scope": "GET /api/org/analytics",
+        "description": "Admin requests aggregates."
+      },
+      {
+        "kind": "propagation",
+        "file": "server/src/routes/org.js",
+        "line": 173,
+        "scope": "POST /api/org/invites",
+        "description": "Email-less invites into a chosen team."
+      },
+      {
+        "kind": "propagation",
+        "file": "server/src/routes/auth.js",
+        "line": 94,
+        "scope": "POST /api/auth/invite/:token/accept",
+        "description": "Admin accepts invites with arbitrary emails."
+      },
+      {
+        "kind": "propagation",
+        "file": "server/src/routes/org.js",
+        "line": 149,
+        "scope": "PATCH /api/org/members/:id",
+        "description": "Admin moves the target into the team."
+      },
+      {
+        "kind": "propagation",
+        "file": "server/src/analytics.js",
+        "line": 21,
+        "scope": "orgAnalytics personDays",
+        "description": "Grouped by current team_id, so history follows the target."
+      },
+      {
+        "kind": "propagation",
+        "file": "server/src/analytics.js",
+        "line": 73,
+        "scope": "orgAnalytics team loop",
+        "description": "Team listed when headcount >= min."
+      },
+      {
+        "kind": "sink",
+        "file": "server/src/analytics.js",
+        "line": 79,
+        "scope": "orgAnalytics team output",
+        "description": "participation always released; avgBreaksPerDay when active >= min."
+      }
+    ],
+    "evidence": [
+      {
+        "file": "server/src/analytics.js",
+        "line": 10,
+        "description": "Stated invariant implemented only as a headcount."
+      },
+      {
+        "file": "server/src/config.js",
+        "line": 27,
+        "description": "minGroupSize = max(3, MIN_GROUP_SIZE || 5)."
+      },
+      {
+        "file": "server/src/analytics.js",
+        "line": 80,
+        "description": "avgBreaksPerDay gated, participation is not."
+      },
+      {
+        "file": "server/src/routes/me.js",
+        "line": 76,
+        "description": "Controlled accounts can log known breaks."
+      }
+    ],
+    "blockers": [
+      "no OS-enforced sandbox available for bounded local execution",
+      "Threat-model fact: whether the MIN_GROUP_SIZE promise must hold against an admin who controls some group members and reassigns teams."
+    ],
+    "validation_plan": {
+      "local": "In an approved sandbox with MIN_GROUP_SIZE=5: target M logs breaks; admin creates team T, moves M in, adds 4 dummy invites into T with no breaks; GET /api/org/analytics?days=7 should show participation 0.2 (vs 0 when M is inactive). Stop at that response.",
+      "deployment": "Product owner states whether the aggregate-only promise must hold against admin-controlled group members, and the deployed MIN_GROUP_SIZE."
+    }
+  }
+]

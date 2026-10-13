@@ -1,0 +1,28 @@
+# Self-hosted Move30: app + PostgreSQL. Put a TLS-terminating reverse proxy in front (Caddy, Traefik, nginx).
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://move30:${POSTGRES_PASSWORD}@db:5432/move30
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: move30
+      POSTGRES_DB: move30
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U move30"]
+      interval: 5s
+      retries: 10
+volumes:
+  pgdata:

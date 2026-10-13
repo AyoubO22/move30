@@ -1,0 +1,1301 @@
+[
+  {
+    "coverage_id": "repository%23configuration%20and%20defaults::server%2Fsrc%2Fconfig.js%23environment%20defaults::profile%2Fquick%2Fall-in-scope-subsystems::ATTACK-CLASSES.md%23Obvious%20things",
+    "canonical_refs": {
+      "surface": "repository#configuration and defaults",
+      "boundary": "server/src/config.js#environment defaults",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "ATTACK-CLASSES.md#Obvious things"
+    },
+    "surface": "configuration and defaults",
+    "boundary": "environment defaults",
+    "subsystem": "all in-scope subsystems (quick profile)",
+    "attack_class": "Obvious things",
+    "starting_paths": [
+      "server/src/config.js",
+      "server/src/app.js",
+      "server/src/seed-demo.js",
+      "server/src/index.js",
+      ".gitignore",
+      "server/package.json"
+    ],
+    "ordinary_attack_class_block": "ATTACK-CLASSES.md#Obvious things",
+    "selected_companion_blocks": [],
+    "excluded_blocks": [],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "covered",
+    "agent_id": "h4-client-obvious",
+    "reviewed_paths": [
+      ".gitignore",
+      "server/package-lock.json",
+      "server/package.json",
+      "server/src/app.js",
+      "server/src/config.js",
+      "server/src/index.js",
+      "server/src/routes/auth.js",
+      "server/src/security.js",
+      "server/src/seed-demo.js",
+      "web/package-lock.json",
+      "web/vite.config.ts"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "h4-client-obvious",
+        "reviewed_paths": [
+          "server/src/config.js",
+          "server/src/security.js"
+        ],
+        "invariant": "No hardcoded secret usable in production",
+        "method": "source",
+        "result": "Dev fallback blocked in production.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h4-client-obvious",
+        "reviewed_paths": [
+          "server/src/seed-demo.js"
+        ],
+        "invariant": "Seed credentials not usable in production by default",
+        "method": "source",
+        "result": "Refuses in prod; random password.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h4-client-obvious",
+        "reviewed_paths": [
+          "server/src/app.js",
+          "server/src/index.js"
+        ],
+        "invariant": "No unprotected debug endpoints; no internal error leakage",
+        "method": "source",
+        "result": "Only /healthz {ok}.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h4-client-obvious",
+        "reviewed_paths": [
+          "server/src/security.js",
+          "server/src/routes/auth.js"
+        ],
+        "invariant": "Cookie attributes",
+        "method": "source",
+        "result": "httpOnly, SameSite=Lax, Secure+__Host- in prod.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h4-client-obvious",
+        "reviewed_paths": [
+          "server/src/routes/auth.js",
+          "server/src/app.js"
+        ],
+        "invariant": "No open redirect, permissive CORS, dynamic exec",
+        "method": "source",
+        "result": "Fixed redirect targets; no CORS; no eval.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h4-client-obvious",
+        "reviewed_paths": [
+          ".gitignore",
+          "server/package.json",
+          "server/package-lock.json",
+          "web/package-lock.json",
+          "web/vite.config.ts"
+        ],
+        "invariant": "No committed secrets; locked deps",
+        "method": "source",
+        "result": "Lockfiles committed; no secret files.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h4-client-obvious",
+        "reviewed_paths": [
+          "server/src/app.js",
+          "server/src/config.js"
+        ],
+        "invariant": "TLS enforced in production",
+        "method": "source",
+        "result": "HSTS and upgrade-insecure-requests in prod.",
+        "artifact": null
+      }
+    ],
+    "result_fingerprints": [],
+    "unresolved": [],
+    "parent_hardening_notes": [
+      "MIN_GROUP_SIZE/SESSION_DAYS/INVITE_DAYS non-numeric values produce NaN and silently disable suppression.",
+      "Production safety depends on NODE_ENV; fail closed when APP_URL is https.",
+      ".gitignore should cover .env.*, *.pem, *.key.",
+      "Document FRAME_ANCESTORS exact origins."
+    ]
+  },
+  {
+    "coverage_id": "server%2Fsrc%2Fapp.js%23all%20HTML%20responses::server%2Fsrc%2Fapp.js%23frame-ancestors::profile%2Fquick%2Fall-in-scope-subsystems::CLIENT-SIDE.md%23Clickjacking",
+    "canonical_refs": {
+      "surface": "server/src/app.js#all HTML responses",
+      "boundary": "server/src/app.js#frame-ancestors",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "CLIENT-SIDE.md#Clickjacking"
+    },
+    "surface": "all HTML responses",
+    "boundary": "frame-ancestors",
+    "subsystem": "all in-scope subsystems (quick profile)",
+    "attack_class": "Clickjacking",
+    "starting_paths": [
+      "server/src/app.js",
+      "server/src/config.js",
+      "web/src/pages/admin/Security.tsx"
+    ],
+    "ordinary_attack_class_block": null,
+    "selected_companion_blocks": [
+      "CLIENT-SIDE.md#Clickjacking",
+      "CLIENT-SIDE.md#Core discipline",
+      "CLIENT-SIDE.md#Universal moves",
+      "CLIENT-SIDE.md#Validation rules"
+    ],
+    "excluded_blocks": [],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "covered",
+    "agent_id": "h4-client-obvious",
+    "reviewed_paths": [
+      "server/src/app.js",
+      "server/src/config.js",
+      "web/src/pages/admin/Security.tsx"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "h4-client-obvious",
+        "reviewed_paths": [
+          "server/src/app.js",
+          "server/src/config.js"
+        ],
+        "invariant": "Every HTML response has framing protection",
+        "method": "source",
+        "result": "frame-ancestors 'self' (+operator list); XFO SAMEORIGIN by default.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h4-client-obvious",
+        "reviewed_paths": [
+          "web/src/pages/admin/Security.tsx"
+        ],
+        "invariant": "Teams manifest helper does not widen framing",
+        "method": "source",
+        "result": "Client-side download only.",
+        "artifact": null
+      }
+    ],
+    "result_fingerprints": [],
+    "unresolved": []
+  },
+  {
+    "coverage_id": "server%2Fsrc%2Froutes%2Fauth.js%23GET%20%2Fapi%2Fauth%2Fsso%2Fcallback::server%2Fsrc%2Froutes%2Fauth.js%23SSO%20provisioning::profile%2Fquick%2Fall-in-scope-subsystems::WEB-PROTOCOL-AND-AUTH.md%23Account%20linking%20and%20identity%20collision",
+    "canonical_refs": {
+      "surface": "server/src/routes/auth.js#GET /api/auth/sso/callback",
+      "boundary": "server/src/routes/auth.js#SSO provisioning",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "WEB-PROTOCOL-AND-AUTH.md#Account linking and identity collision"
+    },
+    "surface": "GET /api/auth/sso/callback",
+    "boundary": "SSO provisioning",
+    "subsystem": "all in-scope subsystems (quick profile)",
+    "attack_class": "Account linking and identity collision",
+    "starting_paths": [
+      "server/src/routes/auth.js",
+      "server/src/routes/org.js",
+      "server/src/routes/me.js",
+      "db/migrations/001_init.sql"
+    ],
+    "ordinary_attack_class_block": null,
+    "selected_companion_blocks": [
+      "WEB-PROTOCOL-AND-AUTH.md#Account linking and identity collision",
+      "WEB-PROTOCOL-AND-AUTH.md#Core discipline",
+      "WEB-PROTOCOL-AND-AUTH.md#Universal moves",
+      "WEB-PROTOCOL-AND-AUTH.md#Validation rules"
+    ],
+    "excluded_blocks": [],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "candidate",
+    "agent_id": "h2-sso",
+    "reviewed_paths": [
+      "db/migrations/001_init.sql",
+      "server/src/routes/auth.js",
+      "server/src/routes/me.js",
+      "server/src/routes/org.js"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "h2-sso",
+        "reviewed_paths": [
+          "server/src/routes/auth.js",
+          "server/src/routes/org.js",
+          "server/src/routes/me.js",
+          "db/migrations/001_init.sql"
+        ],
+        "invariant": "Linking requires proof of control of the existing account and a verified email",
+        "method": "source",
+        "result": "Violated: step-2 links by email claim only (candidate auth.js/sso-callback/email-autolink-without-proof).",
+        "artifact": null
+      },
+      {
+        "agent_id": "h2-sso",
+        "reviewed_paths": [
+          "server/src/routes/auth.js",
+          "db/migrations/001_init.sql"
+        ],
+        "invariant": "No cross-org collision",
+        "method": "source",
+        "result": "(org,sub) unique; cross-org link refused; invites bound to org.",
+        "artifact": null
+      }
+    ],
+    "result_fingerprints": [
+      "auth.js/sso-callback/email-autolink-without-proof"
+    ],
+    "unresolved": [],
+    "parent_final_decisions": {
+      "auth.js/sso-callback/email-autolink-without-proof": "needs_validation"
+    }
+  },
+  {
+    "coverage_id": "server%2Fsrc%2Froutes%2Fauth.js%23GET%20%2Fapi%2Fauth%2Fsso%2Fcallback::server%2Fsrc%2Froutes%2Fauth.js%23SSO%20provisioning::profile%2Fquick%2Fall-in-scope-subsystems::WEB-PROTOCOL-AND-AUTH.md%23OAuth%2FOIDC%20request%20and%20callback%20binding",
+    "canonical_refs": {
+      "surface": "server/src/routes/auth.js#GET /api/auth/sso/callback",
+      "boundary": "server/src/routes/auth.js#SSO provisioning",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "WEB-PROTOCOL-AND-AUTH.md#OAuth/OIDC request and callback binding"
+    },
+    "surface": "GET /api/auth/sso/callback",
+    "boundary": "SSO provisioning",
+    "subsystem": "all in-scope subsystems (quick profile)",
+    "attack_class": "OAuth/OIDC request and callback binding",
+    "starting_paths": [
+      "server/src/routes/auth.js",
+      "server/src/security.js",
+      "server/src/routes/org.js"
+    ],
+    "ordinary_attack_class_block": null,
+    "selected_companion_blocks": [
+      "WEB-PROTOCOL-AND-AUTH.md#OAuth/OIDC request and callback binding",
+      "WEB-PROTOCOL-AND-AUTH.md#Core discipline",
+      "WEB-PROTOCOL-AND-AUTH.md#Universal moves",
+      "WEB-PROTOCOL-AND-AUTH.md#Validation rules"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "WEB-PROTOCOL-AND-AUTH.md#SAML signed-object and assertion binding",
+        "reason": "no SAML"
+      },
+      {
+        "block": "WEB-PROTOCOL-AND-AUTH.md#JWT verification and claim binding",
+        "reason": "ID-token verification delegated to openid-client client.callback; reviewed under OAuth/OIDC unit"
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "candidate",
+    "agent_id": "h2-sso",
+    "reviewed_paths": [
+      "server/node_modules/openid-client/lib/client.js",
+      "server/node_modules/openid-client/lib/issuer.js",
+      "server/src/routes/auth.js",
+      "server/src/routes/org.js",
+      "server/src/security.js",
+      "web/src/pages/admin/Security.tsx"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "h2-sso",
+        "reviewed_paths": [
+          "server/src/routes/auth.js",
+          "server/src/security.js",
+          "server/node_modules/openid-client/lib/client.js"
+        ],
+        "invariant": "state/nonce/PKCE bound to initiating browser",
+        "method": "source",
+        "result": "Signed httpOnly cookie; client.callback checks state, nonce, verifier.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h2-sso",
+        "reviewed_paths": [
+          "server/src/routes/auth.js",
+          "server/node_modules/openid-client/lib/client.js"
+        ],
+        "invariant": "No cross-org IdP mix-up",
+        "method": "source",
+        "result": "PKCE+nonce from per-flow cookie prevent code re-injection; iss param checked when present.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h2-sso",
+        "reviewed_paths": [
+          "server/src/routes/auth.js",
+          "server/src/routes/org.js",
+          "server/node_modules/openid-client/lib/issuer.js",
+          "server/node_modules/openid-client/lib/client.js",
+          "web/src/pages/admin/Security.tsx"
+        ],
+        "invariant": "Issuer restricted to the org's own tenant",
+        "method": "source",
+        "result": "Violated for Entra multi-tenant discovery URLs (candidate auth.js/sso-callback/multitenant-issuer-accepted).",
+        "artifact": null
+      }
+    ],
+    "result_fingerprints": [
+      "auth.js/sso-callback/multitenant-issuer-accepted"
+    ],
+    "unresolved": [],
+    "parent_hardening_notes": [
+      "Reserve slug 'callback' or register the callback route first.",
+      "SSO start via cross-site GET enables login CSRF into an attacker org."
+    ],
+    "parent_final_decisions": {
+      "auth.js/sso-callback/multitenant-issuer-accepted": "needs_validation"
+    }
+  },
+  {
+    "coverage_id": "server%2Fsrc%2Froutes%2Fauth.js%23POST%20%2Fapi%2Fauth%2Finvite%2F%3Atoken%2Faccept::server%2Fsrc%2Froutes%2Fauth.js%23findInvite::profile%2Fquick%2Fall-in-scope-subsystems::ATTACK-CLASSES.md%23Business%20logic",
+    "canonical_refs": {
+      "surface": "server/src/routes/auth.js#POST /api/auth/invite/:token/accept",
+      "boundary": "server/src/routes/auth.js#findInvite",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "ATTACK-CLASSES.md#Business logic"
+    },
+    "surface": "POST /api/auth/invite/:token/accept",
+    "boundary": "findInvite",
+    "subsystem": "all in-scope subsystems (quick profile)",
+    "attack_class": "Business logic",
+    "starting_paths": [
+      "server/src/routes/auth.js",
+      "server/src/routes/org.js",
+      "db/migrations/001_init.sql"
+    ],
+    "ordinary_attack_class_block": "ATTACK-CLASSES.md#Business logic",
+    "selected_companion_blocks": [],
+    "excluded_blocks": [
+      {
+        "block": "WEB-PROTOCOL-AND-AUTH.md#Password reset and broader recovery",
+        "reason": "no password reset or recovery flow in source"
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "candidate",
+    "agent_id": "h1-auth-session",
+    "reviewed_paths": [
+      "db/migrations/001_init.sql",
+      "server/src/routes/auth.js",
+      "server/src/routes/org.js",
+      "web/src/pages/Auth.tsx"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "h1-auth-session",
+        "reviewed_paths": [
+          "server/src/routes/auth.js",
+          "db/migrations/001_init.sql"
+        ],
+        "invariant": "Invite redeemable once, before expiry, race-safe",
+        "method": "source",
+        "result": "Conditional UPDATE used_at IS NULL inside tx; role/team from invite row; email-bound invites force inv.email.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h1-auth-session",
+        "reviewed_paths": [
+          "server/src/routes/auth.js",
+          "web/src/pages/Auth.tsx"
+        ],
+        "invariant": "Email-less invite only registers an identity the holder owns and respects SSO enforcement",
+        "method": "source",
+        "result": "Violated: body email accepted unverified and later auto-linked by SSO (candidate move30/invite-accept-unverified-email-prehijack).",
+        "artifact": null
+      },
+      {
+        "agent_id": "h1-auth-session",
+        "reviewed_paths": [
+          "server/src/routes/org.js",
+          "db/migrations/001_init.sql"
+        ],
+        "invariant": "Admin revocation also revokes invites the admin minted",
+        "method": "source",
+        "result": "Violated (candidate move30/invite-outlives-creator-admin-revocation).",
+        "artifact": null
+      }
+    ],
+    "result_fingerprints": [
+      "move30/invite-accept-unverified-email-prehijack",
+      "move30/invite-outlives-creator-admin-revocation"
+    ],
+    "unresolved": [],
+    "parent_final_decisions": {
+      "move30/invite-accept-unverified-email-prehijack": "needs_validation",
+      "move30/invite-outlives-creator-admin-revocation": "needs_validation"
+    }
+  },
+  {
+    "coverage_id": "server%2Fsrc%2Froutes%2Fauth.js%23POST%20%2Fapi%2Fauth%2Flogin::server%2Fsrc%2Fsecurity.js%23createSession::profile%2Fquick%2Fall-in-scope-subsystems::WEB-PROTOCOL-AND-AUTH.md%23Session%20fixation%20and%20invalidation",
+    "canonical_refs": {
+      "surface": "server/src/routes/auth.js#POST /api/auth/login",
+      "boundary": "server/src/security.js#createSession",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "WEB-PROTOCOL-AND-AUTH.md#Session fixation and invalidation"
+    },
+    "surface": "POST /api/auth/login",
+    "boundary": "createSession",
+    "subsystem": "all in-scope subsystems (quick profile)",
+    "attack_class": "Session fixation and invalidation",
+    "starting_paths": [
+      "server/src/security.js",
+      "server/src/routes/auth.js",
+      "server/src/routes/me.js",
+      "server/src/routes/org.js",
+      "db/migrations/001_init.sql"
+    ],
+    "ordinary_attack_class_block": null,
+    "selected_companion_blocks": [
+      "WEB-PROTOCOL-AND-AUTH.md#Session fixation and invalidation",
+      "WEB-PROTOCOL-AND-AUTH.md#Core discipline",
+      "WEB-PROTOCOL-AND-AUTH.md#Universal moves",
+      "WEB-PROTOCOL-AND-AUTH.md#Validation rules"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "WEB-PROTOCOL-AND-AUTH.md#MFA enrollment and assurance downgrade",
+        "reason": "no MFA in source"
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "covered",
+    "agent_id": "h1-auth-session",
+    "reviewed_paths": [
+      "db/migrations/001_init.sql",
+      "server/src/routes/auth.js",
+      "server/src/routes/me.js",
+      "server/src/routes/org.js",
+      "server/src/security.js"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "h1-auth-session",
+        "reviewed_paths": [
+          "server/src/security.js",
+          "server/src/routes/auth.js"
+        ],
+        "invariant": "Every login path mints a fresh server token",
+        "method": "source",
+        "result": "createSession always uses randomBytes(32); loadUser only accepts stored hashes; __Host- prefix in production.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h1-auth-session",
+        "reviewed_paths": [
+          "server/src/security.js",
+          "server/src/routes/auth.js",
+          "server/src/routes/me.js",
+          "server/src/routes/org.js",
+          "db/migrations/001_init.sql"
+        ],
+        "invariant": "Sessions revoked on logout, password/role change, deletion; role re-read per request",
+        "method": "source",
+        "result": "Logout, password change, role change delete sessions; deletions cascade; loadUser re-joins users each request.",
+        "artifact": null
+      }
+    ],
+    "result_fingerprints": [],
+    "unresolved": [],
+    "parent_hardening_notes": [
+      "Account switch leaves the previous session row valid until expiry.",
+      "Enabling sso_enforced does not revoke existing member password sessions."
+    ]
+  },
+  {
+    "coverage_id": "server%2Fsrc%2Froutes%2Fauth.js%23POST%20%2Fapi%2Fauth%2Flogin::server%2Fsrc%2Fsecurity.js%23csrfGuard::profile%2Fquick%2Fall-in-scope-subsystems::WEB-PROTOCOL-AND-AUTH.md%23Ordinary%20CSRF",
+    "canonical_refs": {
+      "surface": "server/src/routes/auth.js#POST /api/auth/login",
+      "boundary": "server/src/security.js#csrfGuard",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "WEB-PROTOCOL-AND-AUTH.md#Ordinary CSRF"
+    },
+    "surface": "POST /api/auth/login",
+    "boundary": "csrfGuard",
+    "subsystem": "all in-scope subsystems (quick profile)",
+    "attack_class": "Ordinary CSRF",
+    "starting_paths": [
+      "server/src/security.js",
+      "server/src/app.js",
+      "server/src/routes/auth.js",
+      "server/src/routes/me.js",
+      "server/src/routes/org.js",
+      "web/src/api.ts"
+    ],
+    "ordinary_attack_class_block": null,
+    "selected_companion_blocks": [
+      "WEB-PROTOCOL-AND-AUTH.md#Ordinary CSRF",
+      "WEB-PROTOCOL-AND-AUTH.md#Core discipline",
+      "WEB-PROTOCOL-AND-AUTH.md#Universal moves",
+      "WEB-PROTOCOL-AND-AUTH.md#Validation rules"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "WEB-PROTOCOL-AND-AUTH.md#Request framing and desynchronization",
+        "reason": "single Express process; no proxy or custom HTTP parser in source"
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "covered",
+    "agent_id": "h1-auth-session",
+    "reviewed_paths": [
+      "server/src/app.js",
+      "server/src/routes/auth.js",
+      "server/src/routes/me.js",
+      "server/src/routes/org.js",
+      "server/src/security.js",
+      "web/src/api.ts"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "h1-auth-session",
+        "reviewed_paths": [
+          "server/src/security.js",
+          "server/src/app.js"
+        ],
+        "invariant": "Non-GET /api requests require x-move30:1 and Origin==APP_URL when present",
+        "method": "source",
+        "result": "csrfGuard mounted before loadUser and routers; no CORS/method-override; cross-site forms cannot set the header.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h1-auth-session",
+        "reviewed_paths": [
+          "server/src/routes/auth.js",
+          "server/src/routes/me.js",
+          "server/src/routes/org.js"
+        ],
+        "invariant": "No cookie-authenticated state change via GET or unguarded method",
+        "method": "source",
+        "result": "All mutations are POST/PUT/PATCH/DELETE; only SSO GET routes write state (peer-owned OIDC unit).",
+        "artifact": null
+      },
+      {
+        "agent_id": "h1-auth-session",
+        "reviewed_paths": [
+          "web/src/api.ts"
+        ],
+        "invariant": "Client sends the required header",
+        "method": "source",
+        "result": "api() always sends x-move30:1 with same-origin credentials.",
+        "artifact": null
+      }
+    ],
+    "result_fingerprints": [],
+    "unresolved": []
+  },
+  {
+    "coverage_id": "server%2Fsrc%2Froutes%2Fauth.js%23POST%20%2Fapi%2Fauth%2Fsignup::db%2Fmigrations%2F001_init.sql%23users_email_unique::profile%2Fquick%2Fall-in-scope-subsystems::WEB-PROTOCOL-AND-AUTH.md%23Account%20linking%20and%20identity%20collision",
+    "canonical_refs": {
+      "surface": "server/src/routes/auth.js#POST /api/auth/signup",
+      "boundary": "db/migrations/001_init.sql#users_email_unique",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "WEB-PROTOCOL-AND-AUTH.md#Account linking and identity collision"
+    },
+    "surface": "POST /api/auth/signup",
+    "boundary": "users_email_unique",
+    "subsystem": "all in-scope subsystems (quick profile)",
+    "attack_class": "Account linking and identity collision",
+    "starting_paths": [
+      "server/src/routes/auth.js",
+      "db/migrations/001_init.sql",
+      "server/src/config.js",
+      "web/src/pages/Auth.tsx"
+    ],
+    "ordinary_attack_class_block": null,
+    "selected_companion_blocks": [
+      "WEB-PROTOCOL-AND-AUTH.md#Account linking and identity collision",
+      "WEB-PROTOCOL-AND-AUTH.md#Core discipline",
+      "WEB-PROTOCOL-AND-AUTH.md#Validation rules"
+    ],
+    "excluded_blocks": [],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "deferred",
+    "agent_id": null,
+    "reviewed_paths": [],
+    "local_checks": [],
+    "result_fingerprints": [],
+    "unresolved": [
+      "quick_profile_final_critic: Signup accepts any unverified email into the globally unique namespace; squatting can lock a real user out of SSO (sso_conflict) and invites (email_taken)."
+    ]
+  },
+  {
+    "coverage_id": "server%2Fsrc%2Froutes%2Fauth.js%23unauthenticated%20%2Fapi%2Fauth%2F%2A::server%2Fsrc%2Fapp.js%23trust%20proxy%20and%20authLimiter%20keying::profile%2Fquick%2Fall-in-scope-subsystems::RESOURCE-EXHAUSTION-AND-AVAILABILITY.md%23Pre-authentication%20work%20imbalance",
+    "canonical_refs": {
+      "surface": "server/src/routes/auth.js#unauthenticated /api/auth/*",
+      "boundary": "server/src/app.js#trust proxy and authLimiter keying",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Pre-authentication work imbalance"
+    },
+    "surface": "unauthenticated /api/auth/*",
+    "boundary": "trust proxy and authLimiter keying",
+    "subsystem": "all in-scope subsystems (quick profile)",
+    "attack_class": "Pre-authentication work imbalance",
+    "starting_paths": [
+      "server/src/routes/auth.js",
+      "server/src/app.js",
+      "server/src/config.js",
+      "server/src/security.js"
+    ],
+    "ordinary_attack_class_block": null,
+    "selected_companion_blocks": [
+      "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Pre-authentication work imbalance",
+      "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Core discipline",
+      "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md#Validation rules"
+    ],
+    "excluded_blocks": [],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "deferred",
+    "agent_id": null,
+    "reviewed_paths": [],
+    "local_checks": [],
+    "result_fingerprints": [],
+    "unresolved": [
+      "quick_profile_final_critic: Rate-limit keying under trust proxy and pre-auth argon2/discovery cost had no unit; exclusion in architecture was not supported by ledger evidence."
+    ]
+  },
+  {
+    "coverage_id": "server%2Fsrc%2Froutes%2Fme.js%23%2Fapi%2Fme%2F%2A::server%2Fsrc%2Fsecurity.js%23requireUser::profile%2Fquick%2Fall-in-scope-subsystems::DATA-ISOLATION-AND-LIFECYCLE.md%23Stale%20authorization%20and%20derived%20copy%20use",
+    "canonical_refs": {
+      "surface": "server/src/routes/me.js#/api/me/*",
+      "boundary": "server/src/security.js#requireUser",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "DATA-ISOLATION-AND-LIFECYCLE.md#Stale authorization and derived copy use"
+    },
+    "surface": "/api/me/*",
+    "boundary": "requireUser",
+    "subsystem": "all in-scope subsystems (quick profile)",
+    "attack_class": "Stale authorization and derived copy use",
+    "starting_paths": [
+      "server/src/routes/me.js",
+      "server/src/routes/org.js",
+      "server/src/security.js",
+      "db/migrations/001_init.sql"
+    ],
+    "ordinary_attack_class_block": null,
+    "selected_companion_blocks": [
+      "DATA-ISOLATION-AND-LIFECYCLE.md#Stale authorization and derived copy use",
+      "DATA-ISOLATION-AND-LIFECYCLE.md#Core discipline",
+      "DATA-ISOLATION-AND-LIFECYCLE.md#Universal moves",
+      "DATA-ISOLATION-AND-LIFECYCLE.md#Validation rules"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "DATA-ISOLATION-AND-LIFECYCLE.md#Import and restore authority expansion",
+        "reason": "no import or restore feature"
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "candidate",
+    "agent_id": "h3-tenant",
+    "reviewed_paths": [
+      "db/migrations/001_init.sql",
+      "server/src/routes/auth.js",
+      "server/src/routes/me.js",
+      "server/src/routes/org.js",
+      "server/src/security.js"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "h3-tenant",
+        "reviewed_paths": [
+          "server/src/security.js",
+          "db/migrations/001_init.sql",
+          "server/src/routes/org.js",
+          "server/src/routes/me.js"
+        ],
+        "invariant": "Removal/deletion/role change invalidate sessions",
+        "method": "source",
+        "result": "Cascades and explicit deletes; no authz cache.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h3-tenant",
+        "reviewed_paths": [
+          "server/src/routes/org.js",
+          "server/src/routes/auth.js",
+          "db/migrations/001_init.sql"
+        ],
+        "invariant": "Authority derived from an admin ends when that admin is revoked",
+        "method": "source",
+        "result": "Violated (candidate move30/invite-outlives-creator-admin-revocation, duplicate of h1 fingerprint).",
+        "artifact": null
+      }
+    ],
+    "result_fingerprints": [
+      "move30/invite-outlives-creator-admin-revocation"
+    ],
+    "unresolved": [],
+    "parent_final_decisions": {
+      "move30/invite-outlives-creator-admin-revocation": "needs_validation"
+    }
+  },
+  {
+    "coverage_id": "server%2Fsrc%2Froutes%2Fme.js%23GET%20%2Fapi%2Fme%2Fexport%2C%20DELETE%20%2Fapi%2Fme%2C%20DELETE%20%2Fapi%2Forg::server%2Fsrc%2Froutes%2Fme.js%23erasure%20and%20export%20scope::profile%2Fquick%2Fall-in-scope-subsystems::DATA-ISOLATION-AND-LIFECYCLE.md%23Export%20and%20backup%20scope%20expansion",
+    "canonical_refs": {
+      "surface": "server/src/routes/me.js#GET /api/me/export, DELETE /api/me, DELETE /api/org",
+      "boundary": "server/src/routes/me.js#erasure and export scope",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "DATA-ISOLATION-AND-LIFECYCLE.md#Export and backup scope expansion"
+    },
+    "surface": "GET /api/me/export, DELETE /api/me, DELETE /api/org",
+    "boundary": "erasure and export scope",
+    "subsystem": "all in-scope subsystems (quick profile)",
+    "attack_class": "Export and backup scope expansion",
+    "starting_paths": [
+      "server/src/routes/me.js",
+      "server/src/routes/org.js",
+      "db/migrations/001_init.sql",
+      "server/src/routes/auth.js"
+    ],
+    "ordinary_attack_class_block": null,
+    "selected_companion_blocks": [
+      "DATA-ISOLATION-AND-LIFECYCLE.md#Export and backup scope expansion",
+      "DATA-ISOLATION-AND-LIFECYCLE.md#Core discipline",
+      "DATA-ISOLATION-AND-LIFECYCLE.md#Validation rules"
+    ],
+    "excluded_blocks": [],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "deferred",
+    "agent_id": null,
+    "reviewed_paths": [],
+    "local_checks": [],
+    "result_fingerprints": [],
+    "unresolved": [
+      "quick_profile_final_critic: Export scope, erasure completeness, invites of deleted users, in-memory issuerCache retention not reviewed against export/retention classes."
+    ]
+  },
+  {
+    "coverage_id": "server%2Fsrc%2Froutes%2Forg.js%23%2Fapi%2Forg%2F%2A::server%2Fsrc%2Froutes%2Forg.js%23org_id%20predicates::profile%2Fquick%2Fall-in-scope-subsystems::DATA-ISOLATION-AND-LIFECYCLE.md%23Missing%20tenant%20or%20owner%20enforcement",
+    "canonical_refs": {
+      "surface": "server/src/routes/org.js#/api/org/*",
+      "boundary": "server/src/routes/org.js#org_id predicates",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "DATA-ISOLATION-AND-LIFECYCLE.md#Missing tenant or owner enforcement"
+    },
+    "surface": "/api/org/*",
+    "boundary": "org_id predicates",
+    "subsystem": "all in-scope subsystems (quick profile)",
+    "attack_class": "Missing tenant or owner enforcement",
+    "starting_paths": [
+      "server/src/routes/org.js",
+      "server/src/routes/me.js",
+      "db/migrations/001_init.sql"
+    ],
+    "ordinary_attack_class_block": null,
+    "selected_companion_blocks": [
+      "DATA-ISOLATION-AND-LIFECYCLE.md#Missing tenant or owner enforcement",
+      "DATA-ISOLATION-AND-LIFECYCLE.md#Core discipline",
+      "DATA-ISOLATION-AND-LIFECYCLE.md#Universal moves",
+      "DATA-ISOLATION-AND-LIFECYCLE.md#Validation rules"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "DATA-ISOLATION-AND-LIFECYCLE.md#Blob and signed-reference overreach",
+        "reason": "no blob storage or signed URLs"
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "covered",
+    "agent_id": "h3-tenant",
+    "reviewed_paths": [
+      "db/migrations/001_init.sql",
+      "server/src/analytics.js",
+      "server/src/routes/me.js",
+      "server/src/routes/org.js"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "h3-tenant",
+        "reviewed_paths": [
+          "server/src/routes/org.js",
+          "db/migrations/001_init.sql"
+        ],
+        "invariant": "Every org.js query binds req.user.org_id",
+        "method": "source",
+        "result": "All reads/writes scoped; referenced teamIds verified against org.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h3-tenant",
+        "reviewed_paths": [
+          "server/src/routes/org.js",
+          "server/src/analytics.js",
+          "db/migrations/001_init.sql"
+        ],
+        "invariant": "Team join counts cannot include other orgs",
+        "method": "source",
+        "result": "All team_id writes are same-org.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h3-tenant",
+        "reviewed_paths": [
+          "server/src/routes/me.js"
+        ],
+        "invariant": "Member routes owner-bound",
+        "method": "source",
+        "result": "All bind req.user.id/org_id.",
+        "artifact": null
+      }
+    ],
+    "result_fingerprints": [],
+    "unresolved": []
+  },
+  {
+    "coverage_id": "server%2Fsrc%2Froutes%2Forg.js%23%2Fapi%2Forg%2F%2A::server%2Fsrc%2Fsecurity.js%23requireAdmin::profile%2Fquick%2Fall-in-scope-subsystems::ATTACK-CLASSES.md%23Access%20control",
+    "canonical_refs": {
+      "surface": "server/src/routes/org.js#/api/org/*",
+      "boundary": "server/src/security.js#requireAdmin",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "ATTACK-CLASSES.md#Access control"
+    },
+    "surface": "/api/org/*",
+    "boundary": "requireAdmin",
+    "subsystem": "all in-scope subsystems (quick profile)",
+    "attack_class": "Access control",
+    "starting_paths": [
+      "server/src/routes/org.js",
+      "server/src/security.js",
+      "server/src/routes/me.js",
+      "server/src/routes/auth.js"
+    ],
+    "ordinary_attack_class_block": "ATTACK-CLASSES.md#Access control",
+    "selected_companion_blocks": [],
+    "excluded_blocks": [],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "covered",
+    "agent_id": "h3-tenant",
+    "reviewed_paths": [
+      "server/src/app.js",
+      "server/src/routes/auth.js",
+      "server/src/routes/me.js",
+      "server/src/routes/org.js",
+      "server/src/security.js"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "h3-tenant",
+        "reviewed_paths": [
+          "server/src/routes/org.js",
+          "server/src/security.js",
+          "server/src/app.js"
+        ],
+        "invariant": "/api/org/* only for current-DB admins",
+        "method": "source",
+        "result": "org.use(requireAdmin); loadUser re-reads role per request.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h3-tenant",
+        "reviewed_paths": [
+          "server/src/routes/me.js",
+          "server/src/routes/auth.js",
+          "server/src/routes/org.js"
+        ],
+        "invariant": "No weaker path to admin state changes",
+        "method": "source",
+        "result": "Strict schemas; org_id never from body.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h3-tenant",
+        "reviewed_paths": [
+          "server/src/routes/org.js"
+        ],
+        "invariant": "At least one admin remains",
+        "method": "source",
+        "result": "Last-admin demotion blocked; self-removal blocked.",
+        "artifact": null
+      }
+    ],
+    "result_fingerprints": [],
+    "unresolved": [],
+    "parent_hardening_notes": [
+      "Concurrent mutual demotion can leave zero admins (only target row locked).",
+      "Self-delete last-admin check is outside the transaction."
+    ]
+  },
+  {
+    "coverage_id": "server%2Fsrc%2Froutes%2Forg.js%23GET%20%2Fapi%2Forg%2Fanalytics::server%2Fsrc%2Fanalytics.js%23orgAnalytics::profile%2Fquick%2Fall-in-scope-subsystems::DATA-ISOLATION-AND-LIFECYCLE.md%23Enumeration%20and%20aggregate%20oracles",
+    "canonical_refs": {
+      "surface": "server/src/routes/org.js#GET /api/org/analytics",
+      "boundary": "server/src/analytics.js#orgAnalytics",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "DATA-ISOLATION-AND-LIFECYCLE.md#Enumeration and aggregate oracles"
+    },
+    "surface": "GET /api/org/analytics",
+    "boundary": "orgAnalytics",
+    "subsystem": "all in-scope subsystems (quick profile)",
+    "attack_class": "Enumeration and aggregate oracles",
+    "starting_paths": [
+      "server/src/analytics.js",
+      "server/src/routes/org.js",
+      "server/src/config.js"
+    ],
+    "ordinary_attack_class_block": null,
+    "selected_companion_blocks": [
+      "DATA-ISOLATION-AND-LIFECYCLE.md#Enumeration and aggregate oracles",
+      "DATA-ISOLATION-AND-LIFECYCLE.md#Core discipline",
+      "DATA-ISOLATION-AND-LIFECYCLE.md#Universal moves",
+      "DATA-ISOLATION-AND-LIFECYCLE.md#Validation rules"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "DATA-ISOLATION-AND-LIFECYCLE.md#Search, cache, and index ACL drift",
+        "reason": "no search index or cache"
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "candidate",
+    "agent_id": "h3-tenant",
+    "reviewed_paths": [
+      "server/src/analytics.js",
+      "server/src/config.js",
+      "server/src/routes/auth.js",
+      "server/src/routes/me.js",
+      "server/src/routes/org.js"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "h3-tenant",
+        "reviewed_paths": [
+          "server/src/analytics.js",
+          "server/src/config.js"
+        ],
+        "invariant": "Admins only see aggregates over >= MIN_GROUP_SIZE people",
+        "method": "source",
+        "result": "Violated: headcount counts admin-controlled accounts; participation released without active gate (candidate server/src/analytics.js:orgAnalytics:min-group-suppression-bypass-via-admin-controlled-group-composition).",
+        "artifact": null
+      },
+      {
+        "agent_id": "h3-tenant",
+        "reviewed_paths": [
+          "server/src/routes/org.js",
+          "server/src/routes/auth.js",
+          "server/src/routes/me.js"
+        ],
+        "invariant": "Oracle prerequisites reachable by an ordinary admin",
+        "method": "source",
+        "result": "Unlimited email-less invites, team reassignment, known dummy breaks.",
+        "artifact": null
+      }
+    ],
+    "result_fingerprints": [
+      "server/src/analytics.js:orgAnalytics:min-group-suppression-bypass-via-admin-controlled-group-composition"
+    ],
+    "unresolved": [],
+    "parent_hardening_notes": [
+      "Daily series suppressed flag and org participation leak small-count signals."
+    ],
+    "parent_final_decisions": {
+      "server/src/analytics.js:orgAnalytics:min-group-suppression-bypass-via-admin-controlled-group-composition": "needs_validation"
+    }
+  },
+  {
+    "coverage_id": "server%2Fsrc%2Froutes%2Forg.js%23PUT%20%2Fapi%2Forg%2Fsso::server%2Fsrc%2Fnetguard.js%23assertPublicHttpsUrl::profile%2Fquick%2Fall-in-scope-subsystems::ATTACK-CLASSES.md%23Resource%20and%20file%20handling",
+    "canonical_refs": {
+      "surface": "server/src/routes/org.js#PUT /api/org/sso",
+      "boundary": "server/src/netguard.js#assertPublicHttpsUrl",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "ATTACK-CLASSES.md#Resource and file handling"
+    },
+    "surface": "PUT /api/org/sso",
+    "boundary": "assertPublicHttpsUrl",
+    "subsystem": "all in-scope subsystems (quick profile)",
+    "attack_class": "Resource and file handling",
+    "starting_paths": [
+      "server/src/netguard.js",
+      "server/src/routes/auth.js",
+      "server/src/routes/org.js",
+      "server/src/config.js"
+    ],
+    "ordinary_attack_class_block": "ATTACK-CLASSES.md#Resource and file handling",
+    "selected_companion_blocks": [],
+    "excluded_blocks": [],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "candidate",
+    "agent_id": "h2-sso",
+    "reviewed_paths": [
+      "server/node_modules/openid-client/lib/helpers/client.js",
+      "server/node_modules/openid-client/lib/helpers/issuer.js",
+      "server/node_modules/openid-client/lib/helpers/request.js",
+      "server/node_modules/openid-client/lib/issuer.js",
+      "server/src/config.js",
+      "server/src/netguard.js",
+      "server/src/routes/auth.js",
+      "server/src/routes/org.js"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "h2-sso",
+        "reviewed_paths": [
+          "server/src/netguard.js",
+          "server/src/routes/auth.js",
+          "server/src/routes/org.js",
+          "server/src/config.js",
+          "server/node_modules/openid-client/lib/issuer.js",
+          "server/node_modules/openid-client/lib/helpers/request.js",
+          "server/node_modules/openid-client/lib/helpers/client.js",
+          "server/node_modules/openid-client/lib/helpers/issuer.js"
+        ],
+        "invariant": "All IdP-driven server fetches go to public HTTPS hosts",
+        "method": "source",
+        "result": "Violated: token_endpoint/jwks_uri unchecked, http allowed, DNS not pinned (candidate netguard.js/sso-discovered-endpoints-unguarded).",
+        "artifact": null
+      },
+      {
+        "agent_id": "h2-sso",
+        "reviewed_paths": [
+          "server/src/netguard.js",
+          "server/node_modules/openid-client/lib/issuer.js"
+        ],
+        "invariant": "URL parsers agree on host",
+        "method": "source",
+        "result": "No differential established.",
+        "artifact": null
+      }
+    ],
+    "result_fingerprints": [
+      "netguard.js/sso-discovered-endpoints-unguarded"
+    ],
+    "unresolved": [],
+    "parent_final_decisions": {
+      "netguard.js/sso-discovered-endpoints-unguarded": "needs_validation"
+    }
+  },
+  {
+    "coverage_id": "server%2Fsrc%2Froutes%2Forg.js%23PUT%20%2Fapi%2Forg%2Fsso::server%2Fsrc%2Froutes%2Fauth.js%23SSO%20step%201%20%28org_id%2C%20sso_sub%29%20binding::profile%2Fquick%2Fall-in-scope-subsystems::ATTACK-CLASSES.md%23Chained%20vulnerabilities%20and%20trust%20boundaries",
+    "canonical_refs": {
+      "surface": "server/src/routes/org.js#PUT /api/org/sso",
+      "boundary": "server/src/routes/auth.js#SSO step 1 (org_id, sso_sub) binding",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "ATTACK-CLASSES.md#Chained vulnerabilities and trust boundaries"
+    },
+    "surface": "PUT /api/org/sso",
+    "boundary": "SSO step 1 (org_id, sso_sub) binding",
+    "subsystem": "all in-scope subsystems (quick profile)",
+    "attack_class": "Chained vulnerabilities and trust boundaries",
+    "starting_paths": [
+      "server/src/routes/org.js",
+      "server/src/routes/auth.js",
+      "server/src/routes/me.js",
+      "db/migrations/001_init.sql"
+    ],
+    "ordinary_attack_class_block": "ATTACK-CLASSES.md#Chained vulnerabilities and trust boundaries",
+    "selected_companion_blocks": [],
+    "excluded_blocks": [],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "deferred",
+    "agent_id": null,
+    "reviewed_paths": [],
+    "local_checks": [],
+    "result_fingerprints": [],
+    "unresolved": [
+      "quick_profile_final_critic: Issuer rotation does not clear sso_sub bindings; admin-controlled IdP impersonation lifecycle not reviewed as its own unit (partly covered by the verified auto-link record)."
+    ]
+  },
+  {
+    "coverage_id": "server%2Fsrc%2Fsecurity.js%23token%2C%20password%20and%20secret%20helpers::server%2Fsrc%2Fconfig.js%23signKey%2FencKey::profile%2Fquick%2Fall-in-scope-subsystems::ATTACK-CLASSES.md%23Cryptography%20and%20secrets",
+    "canonical_refs": {
+      "surface": "server/src/security.js#token, password and secret helpers",
+      "boundary": "server/src/config.js#signKey/encKey",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "ATTACK-CLASSES.md#Cryptography and secrets"
+    },
+    "surface": "token, password and secret helpers",
+    "boundary": "signKey/encKey",
+    "subsystem": "all in-scope subsystems (quick profile)",
+    "attack_class": "Cryptography and secrets",
+    "starting_paths": [
+      "server/src/security.js",
+      "server/src/config.js",
+      "server/src/routes/org.js",
+      "server/src/seed-demo.js"
+    ],
+    "ordinary_attack_class_block": "ATTACK-CLASSES.md#Cryptography and secrets",
+    "selected_companion_blocks": [],
+    "excluded_blocks": [],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "covered",
+    "agent_id": "h1-auth-session",
+    "reviewed_paths": [
+      "server/src/config.js",
+      "server/src/routes/org.js",
+      "server/src/security.js",
+      "server/src/seed-demo.js"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "h1-auth-session",
+        "reviewed_paths": [
+          "server/src/security.js"
+        ],
+        "invariant": "CSPRNG tokens stored hashed; argon2id with dummy-hash timing",
+        "method": "source",
+        "result": "randomBytes(32), sha256 storage, argon2id m=19456 t=2 p=1.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h1-auth-session",
+        "reviewed_paths": [
+          "server/src/security.js",
+          "server/src/config.js"
+        ],
+        "invariant": "Constant-time MAC, AEAD with unique nonces, independent keys",
+        "method": "source",
+        "result": "HMAC+timingSafeEqual; AES-256-GCM random IV; domain-separated keys; prod requires APP_SECRET>=32.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h1-auth-session",
+        "reviewed_paths": [
+          "server/src/routes/org.js",
+          "server/src/seed-demo.js"
+        ],
+        "invariant": "Secrets never returned, logged or placed in URLs",
+        "method": "source",
+        "result": "GET /org returns hasSecret only; invite token shown once; demo seed random and blocked in prod.",
+        "artifact": null
+      }
+    ],
+    "result_fingerprints": [],
+    "unresolved": [],
+    "parent_hardening_notes": [
+      "Pass authTagLength:16 to createDecipheriv and use org id as AAD.",
+      "APP_SECRET check is length-only."
+    ]
+  },
+  {
+    "coverage_id": "web%2Fsrc%2Fpages%23SPA%20rendering%20of%20server%20data::server%2Fsrc%2Fapp.js%23helmet%20CSP::profile%2Fquick%2Fall-in-scope-subsystems::CLIENT-SIDE.md%23DOM-based%20XSS",
+    "canonical_refs": {
+      "surface": "web/src/pages#SPA rendering of server data",
+      "boundary": "server/src/app.js#helmet CSP",
+      "subsystem": "profile/quick/all-in-scope-subsystems",
+      "attack_class": "CLIENT-SIDE.md#DOM-based XSS"
+    },
+    "surface": "SPA rendering of server data",
+    "boundary": "helmet CSP",
+    "subsystem": "all in-scope subsystems (quick profile)",
+    "attack_class": "DOM-based XSS",
+    "starting_paths": [
+      "web/src",
+      "web/index.html",
+      "web/public",
+      "server/src/app.js"
+    ],
+    "ordinary_attack_class_block": null,
+    "selected_companion_blocks": [
+      "CLIENT-SIDE.md#DOM-based XSS",
+      "CLIENT-SIDE.md#Core discipline",
+      "CLIENT-SIDE.md#Universal moves",
+      "CLIENT-SIDE.md#Validation rules"
+    ],
+    "excluded_blocks": [
+      {
+        "block": "CLIENT-SIDE.md#Service-worker registration and scope takeover",
+        "reason": "no service worker"
+      },
+      {
+        "block": "CLIENT-SIDE.md#`postMessage` origin and source trust",
+        "reason": "no postMessage use"
+      }
+    ],
+    "prior_status": "none",
+    "attempts": [],
+    "wave": 1,
+    "status": "covered",
+    "agent_id": "h4-client-obvious",
+    "reviewed_paths": [
+      "server/src/app.js",
+      "server/src/routes/me.js",
+      "server/src/routes/org.js",
+      "web/index.html",
+      "web/public/theme.js",
+      "web/src",
+      "web/src/pages/Shell.tsx",
+      "web/src/session.tsx"
+    ],
+    "local_checks": [
+      {
+        "agent_id": "h4-client-obvious",
+        "reviewed_paths": [
+          "web/src",
+          "web/index.html",
+          "web/public/theme.js"
+        ],
+        "invariant": "No data reaches HTML/script sinks",
+        "method": "source",
+        "result": "No innerHTML/eval/dangerouslySetInnerHTML; location sinks are regex-checked relative paths.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h4-client-obvious",
+        "reviewed_paths": [
+          "web/src/pages/Shell.tsx",
+          "server/src/routes/org.js",
+          "server/src/routes/me.js",
+          "web/src/session.tsx"
+        ],
+        "invariant": "Branding values cannot become executable URLs",
+        "method": "source",
+        "result": "logoUrl https-only into img src; accent enum.",
+        "artifact": null
+      },
+      {
+        "agent_id": "h4-client-obvious",
+        "reviewed_paths": [
+          "server/src/app.js"
+        ],
+        "invariant": "CSP blocks inline/third-party script",
+        "method": "source",
+        "result": "script-src 'self', object-src 'none'.",
+        "artifact": null
+      }
+    ],
+    "result_fingerprints": [],
+    "unresolved": [],
+    "parent_hardening_notes": [
+      "Admin logoUrl on an external host lets the admin observe member page loads; consider uploaded/proxied logos."
+    ]
+  }
+]
